@@ -1,93 +1,161 @@
-package javaproject_tetris;
+package main;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-import javaproject_tetris.Shape.Piece;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
-public class Board {
-	int width;//Å×Æ®¸®½º ¹è°æ °¡·Î ±æÀÌ
-	int height;//Å×Æ®¸®½º ¹è°æ ¼¼·Î ±æÀÌ
-	
-	boolean started=false;//½ÃÀÛ
-	boolean paused=false;//¸ØÃã
-	boolean finished=false;//³¡
-	
-	int currentX=0;//ºí·ÏÀÇ XÁÂÇ¥
-	int currentY=0;//ºí·ÏÀÇ YÁÂÇ¥
-	Shape currentShape;//ºí·ÏÀÇ ¸ğ¾ç
+public class Board extends JPanel implements ActionListener {
+	int width = 10; // í…ŒíŠ¸ë¦¬ìŠ¤ ê°€ìƒ ê°€ë¡œ ê¸¸ì´
+	int height = 22; // í…ŒíŠ¸ë¦¬ìŠ¤ ê°€ìƒ ì„¸ë¡œ ê¸¸ì´
 
-	
-	public Board(){//»ı¼ºÀÚ
-		width=10;
-		height=20;
-		currentShape = new Shape();//ºí·Ï»ı¼º
-		clearBoard();//Å×Æ®¸®½º ¹è°æ ÃÊ±âÈ­
+	Timer timer;
+	boolean started = false;
+	boolean paused = false;
+
+	int currentX = 0; // ë¸”ë¡ì˜ xì¢Œí‘œ
+	int currentY = 0; // ë¸”ë¡ì˜ yì¢Œí‘œ
+
+	Shape currentShape; // ë¸”ë¡ì˜ í˜•íƒœ
+
+	// Piece[] board; // ê°€ìƒ í…ŒíŠ¸ë¦¬ìŠ¤ í•„ë“œ
+	// TODO ì¶”í›„ìˆ˜ì •
+
+	public Board() {
+		setFocusable(true);// í¬ì»¤ìŠ¤ ì„¤ì •
+		currentShape = new Shape();
+		timer = new Timer(400, this);// ì¼ì • ì‹œê°„ë§ˆë‹¤ actionPerformed ë©”ì†Œë“œ ì‹¤í–‰(imp
+										// ActionListener) 400 ms
+		timer.start();// íƒ€ì´ë¨¸ ì‹œì‘
+
+		// ìŒ“ì´ëŠ” ë¸”ë¡ì— ëŒ€í•œ ì •ë³´ë¥¼ ì €ì¥í•˜ëŠ” í•„ë“œ ìƒì„±
+		// board = new Piece[width * height];
+		// TODO ì¶”í›„ìˆ˜ì •
+		// í…ŒíŠ¸ë¦¬ìŠ¤ ê²Œì„ì— ëŒ€í•œ í‚¤ë³´ë“œ ë¦¬ìŠ¤ë„ˆ ë“±ë¡
+		addKeyListener(new Adapter());
+		clearBoard();
 	}
-	//Å×Æ®¸®½º °ÔÀÓÀ» ½ÃÀÛÇÏ´Â ÇÔ¼ö
-	public void start(){
-		if(paused)//Á¤Áö »óÅÂÀÎ °æ¿ì Á¤Áö
+
+	public void start() { // ê²Œì„ ì‹œì‘
+		if (paused)// ì •ì§€ ìƒíƒœì¸ ê²½ìš° ì •ì§€
 			return;
-		started=true;
-		finished=false;
-		clearBoard();//Å×Æ®¸®½º ¹è°æ ÃÊ±âÈ­
-		
-		newPiece();//»õ·Î¿î ºí·° »ı¼º
+
+		started = true;
+		clearBoard();
+
+		newPiece();
+		timer.start();
 	}
-	//°ÔÀÓ Á¤Áö È¤Àº ´Ù½Ã ½ÃÀÛ
-	private void pause(){
-		if(!started){
+
+	private void pause() { // ê²Œì„ ì •ì§€ í˜¹ì€ ë‹¤ì‹œ ì‹œì‘
+		if (!started)
 			return;
+
+		paused = !paused;
+		if (paused) {
+			timer.stop();
+		} else {
+			timer.start();
 		}
-		paused=!paused;//Á¤Áö»óÅÂ·Î
-		if(paused){//Á¤ÁöÇÒ¶§
-			System.out.println("paused");//paused ¸Ş½ÃÁö ¶ì¿ì±â. ¾ÆÁ÷ ¸ğ¸§.
-		}else{
-			start();//´Ù½Ã ½ÃÀÛ
+		repaint();
+	}
+
+	public void paint(Graphics g) {
+		super.paint(g);
+
+		Dimension size = getSize();
+		int boardTop = (int) size.getHeight() - height * ((int) size.getHeight() / height);
+
+		// ìŒ“ì—¬ ìˆëŠ” ë¸”ë¡ì„ ê·¸ë¦°ë‹¤.
+		for (int i = 0; i < height; ++i) {
+			for (int j = 0; j < width; ++j) {
+				// TODO panel-->ë³€í™”ì‹œ ë‹¤ì‹œ ì½”ë”©
+				Piece shape = board[((height - i - 1) * width) + j];
+				if (shape != Piece.NoShape)
+					drawShape(g, 0 + j * ((int) size.getWidth() / width),
+							boardTop + i * ((int) size.getHeight() / height), shape);
+			}
+		}
+
+		// TODO panel --> ë³€í™”ì‹œ ë‹¤ì‹œ ì½”ë”©
+		// í˜„ì¬ ë–¨ì–´ì§€ê³  ìˆëŠ” í…ŒíŠ¸ë¦¬ìŠ¤ ë¸”ë¡ì„ ê·¸ë¦°ë‹¤.
+		if (currentShape.getPiece() != Piece.NoShape) {
+			// í…ŒíŠ¸ë¦¬ìŠ¤ ë¸”ë¡ì„ ê·¸ë¦°ë‹¤.
+			for (int i = 0; i < 4; ++i) {
+				int x = currentX + currentShape.getX(i);
+				int y = currentY - currentShape.getY(i);
+				drawShape(g, 0 + x * ((int) size.getWidth() / width),
+						boardTop + (height - y - 1) * ((int) size.getHeight() / height), currentShape.getPiece());
+			}
 		}
 	}
-	//Å×Æ®¸®½º ºí·Ï ÇÑ¹ø¿¡ ¶³¾î Æ®¸®±â-½ºÆäÀÌ½º¹Ù »ç¿ë
-	private void dropDown(){
-		int newY=currentY;//ÇöÀç ºí·Ï YÁÂÇ¥¸¦ º¯¼ö newY¿¡ ÀúÀå
-		
-		while(newY>0){
-			if(!tryMove(currentShape,currentX,newY-1))
-				break;
-			--newY;
+
+	// TODO panelë³€í™”ì‹œ ìˆ˜ì •
+	private void drawShape(Graphics g, int x, int y, Piece shape) {
+		// ìƒ‰ ì •ì˜ ëª¨ì–‘ê³¼ ê°™ì€ ìœ„ì¹˜ì— í•´ë‹¹í•˜ëŠ” ê²ƒì˜ ìƒ‰ì´ ì •ì˜ë˜ì–´ ìˆë‹¤.
+		Color colors[] = { new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102),
+				new Color(102, 102, 204), new Color(204, 204, 102), new Color(204, 102, 204), new Color(102, 204, 204),
+				new Color(218, 170, 0) };
+
+		// ì„ íƒëœ ëª¨ì–‘ì˜ ì»¬ëŸ¬ ê°€ì ¸ì˜¤ê¸°
+		Color color = colors[shape.ordinal()];
+
+		// ì‚¬ê°í˜•ì˜ ë‚´ë¶€
+		g.setColor(color);
+		g.fillRect(x + 1, y + 1, ((int) getSize().getWidth() / width) - 2, ((int) getSize().getHeight() / height) - 2);
+
+		// ì‚¬ê°í˜•ì˜ ì™¸ë¶€ ìƒë‹¨, ì™¼ìª½
+		g.setColor(color.brighter());
+		g.drawLine(x, y + ((int) getSize().getHeight() / height) - 1, x, y); // ì™¼ìª½
+																				// ì„ 
+		g.drawLine(x, y, x + ((int) getSize().getWidth() / width) - 1, y); // ìƒë‹¨
+																			// ì„ 
+
+		// ì‚¬ê°í˜•ì˜ ì™¸ë¶€ í•˜ë‹¨, ì˜¤ë¥¸ìª½
+		g.setColor(color.darker());
+		g.drawLine(x + 1, y + ((int) getSize().getHeight() / height) - 1, x + ((int) getSize().getWidth() / width) - 1,
+				y + ((int) getSize().getHeight() / height) - 1);// í•˜ë‹¨
+		g.drawLine(x + ((int) getSize().getWidth() / width) - 1, y + ((int) getSize().getHeight() / height) - 1,
+				x + ((int) getSize().getWidth() / width) - 1, y + 1);// ì˜¤ë¥¸ìª½
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+
+	};
+
+	class Adapter extends KeyAdapter {
+		@Override
+		public void keyPressed(KeyEvent e){
+			if(!this.isKey)	
+				return;
+			//TODO Methodëª…ë”°ë¼ ë³€ê²½
+			switch (e.getKeyCode()){
+				case KeyEvent.VK_DOWN: // ì•„ë˜ ë°©í–¥í‚¤ë¥¼ ëˆŒë €ì„ ê²½ìš°
+					moveDown(); // í•œ ì¤„ ë–¨ì–´ì§€ê¸°
+					break;
+				case KeyEvent.VK_LEFT: // ì™¼ìª½ ë°©í–¥í‚¤ë¥¼ ëˆŒë €ì„ ê²½ìš°
+					moveLeft(); // ì™¼ìª½ìœ¼ë¡œ í•œ ì¹¸ ì´ë™
+					break;
+				case KeyEvent.VK_RIGHT: //  ì˜¤ë¥¸ìª½ ë°©í–¥í‚¤ë¥¼ ëˆŒë €ì„ ê²½ìš°
+					moveRight(); // ì˜¤ë¥¸ìª½ìœ¼ë¡œ í•œ ì¹¸ ì´ë™
+					break;
+				case KeyEvent.VK_UP: // ìœ„ìª½ ë°©í–¥í‚¤ë¥¼ ëˆŒë €ì„ ê²½ìš°
+					rotate(); // ëª¨ì–‘ ë³€ê²½
+					break;
+				case KeyEvent.VK_SPACE: // ìŠ¤í˜ì´ìŠ¤ ë°”ë¥¼ ëˆŒë €ì„ ê²½ìš°
+					pause(); // ì¼ì‹œì •ì§€
+					break;
+			}
+			
+			
 		}
-		pieceDrop();//ºí·° ½×±â
-	}
-	//ºí·Ï ÀÌµ¿(ÇÑÄ­ ¾Æ·¡·Î ¶³¾îÁö±â)-¾Æ·¡¹æÇâÅ° ¶Ç´Â Å¸ÀÌ¸Ó·ÎÀÎÇÑ.
-	private void oneLineDown(){
-		if(!tryMove(currentShape,currentX,currentY-1))
-			pieceDrop();
-	}
-	//Å×Æ®¸®½º ¹è°æ ÃÊ±âÈ­
-	private void clearBoard(){
-		for(int i=0;i<width*height;i++){
-			//Piece.NoShapeÇØ¾ÆÇÔ. ¿©±â Àß ¸ğ¸£°ÚÀ½.
-		}
-	}
-	//Å×Æ®¸®½º ºí·° ½×±â
-	private void pieceDrop(){
-		//Àß ¸ğ¸£°ÚÀ½.
-		//ºí·ÏÀÌ ½×ÀÌ°í ¸¸¾à¿¡ ºí·ÏÀÌ ÇÑÁÙ °¡µæÂ÷¸é Áö¿ì°í »õ·Î¿î ·£´ı ºí·Ï »ı¼º.
-	}
-	//»õ·Î¿î ºí·Ï »ı¼º
-	private void newPiece(){
-		currentShape.setRandomShape();//·£´ı ºí·Ï ¼³Á¤
-		//Ã³À½ ºí·Ï »ı¼º À§Ä¡´Â »ó´Ü Áß¾ÓÀÌ´Ù.ÀÌ°Å ±¸Çö ¸ğ¸£°ÚÀ½.
-		//°ÔÀÓ ¿À¹ö Á¶°ÇÀ» È®ÀÎÇÑ´Ù.
-	}
-	//ºí·Ï ÀÌµ¿ À¯È¿ °Ë»ç
-	private boolean tryMove(Shape newPiece,int newX, int newY){
-		//4°³ÀÇ ÀÛÀº ºí·Ï È®ÀÎ
-		//º®ÀÌ¸é ´õ ¸ø°¨. ¿·¿¡ ´Ù¸¥ ºí·ÏÀÖÀ¸¸é ´õ ¸ø°¨.
-		//ºí·°ÀÌ ¹Ù´ÚÀÌ°Å³ª ¹Ø¿¡ ´Ù¸¥ ºí·° ÀÖ´Ù¸é »õ·Î¿î ºí·° ½ÃÀÛ
-		return true;//ÀÓ½Ã
-		}
-	//ÁÙ »èÁ¦
-	private void removeFullLine(){
-		//°¡·ÎÁÙ¿¡ ºó°ø°£ ¾øÀ¸¸é ÇØ´ç ÁÙ »èÁ¦
-		
-	}
-	
 }
