@@ -11,21 +11,24 @@ import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import temp.Shape.Tetrominoes;
+
 public class Board extends JPanel implements ActionListener {
+	
 	int width = 10; // 테트리스 가상 가로 길이
 	int height = 22; // 테트리스 가상 세로 길이
 
 	Timer timer;
 	boolean started = false;
 	boolean paused = false;
-	boolean fallingFinished=false;
+	boolean fallingFinished = false;
 
 	int currentX = 0; // 블록의 x좌표
 	int currentY = 0; // 블록의 y좌표
 
 	Shape currentShape; // 블록의 형태
 
-	// Piece[] board; // 가상 테트리스 필드
+	int[][] cells; // 가상 테트리스 필드
 	// TODO 추후수정
 
 	public Board() {
@@ -128,40 +131,63 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	public void dropDown() {
-		int newY=currentY;
-		while(newY>0) {//y좌표가 0보다 크면 즉 맨 밑에 닿을때 까지 y좌표를 감소시켜준다
-			if(!tryMove(currentShape, currentX, newY-1))
+		int newY = currentY;
+		while (newY > 0) {// y좌표가 0보다 크면 즉 맨 밑에 닿을때 까지 y좌표를 감소시켜준다
+			if (!tryMove(currentShape, currentX, newY - 1))
 				break;
 			--newY;
 		}
 		pieceDrop();
 	}
-		
-	}
+
 	public void oneLineDown() {
-		if(!tryMove(currentShape, currentX, currentY-1)) {//한칸 아래로
+		if (!tryMove(currentShape, currentX, currentY - 1)) {// 한칸 아래로
 			pieceDrop();
 		}
-		
+
 	}
-	public void pieceDrop() {//아직 덜 했음!
+
+	public void pieceDrop() {// 아직 덜 했음!
 
 		removeFullLine();
-		
-		if(fallingFinished) {
+
+		if (fallingFinished) {
 			newPiece();
 		}
-		
-		
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
 
 	};
+	
+	private void clearBoard(){
+		cells = new int[width][height];
+	}
 
+	private boolean tryMove(Shape newPiece, int x , int y){
+		for (int i = 0; i < 4; ++i) {
+            int tempX = x + newPiece.getX(i);
+            int tempY = y - newPiece.getY(i);
+            if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height)
+                return false;
+            if (shapeAt(tempY, tempY) != 1)
+                return false;
+        }
+
+        currentShape = newPiece;
+        currentX = x;
+        currentY = y;
+        repaint();
+        return true;
+
+	}
+	
+	private int shapeAt(int x, int y){
+		return cells[x][y];
+	}
 	class Adapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e){
@@ -186,6 +212,6 @@ public class Board extends JPanel implements ActionListener {
 					break;
 			}
 			
-			
+		}
 		}
 }
