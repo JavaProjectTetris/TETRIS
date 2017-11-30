@@ -24,18 +24,24 @@ public class Shape {
 	}
 
 	public int minX(){//블록의 작은 4개 블록의 좌표 중 가장 작은 x좌표
+		
 		int min=Integer.MAX_VALUE;//최대 10자리 숫자를 받아야 최솟값이 바로 들어간다.int타입으로 하면 RuntimeError가 발생할수있다.
+		
 		for(int i=0;i<4;i++){
 			min=Math.min(min,coordinates[i].x);
 		}
+		
 		return min;
 	}
 
 	public int minY(){//블록의 작은 4개 블록의 좌표 중 가장 작은 y좌표
+		
 		int min=Integer.MAX_VALUE;
+		
 		for(int i=0;i<4;i++){
 			min=Math.min(min, coordinates[i].y);
 		}
+		
 		return min;
 	}
 
@@ -44,7 +50,7 @@ public class Shape {
 		calculateCoordinate();
 	}
 
-public void moveLeft(){//왼쪽으로 움직였을때 작은 4개 블록의 좌표
+	public void moveLeft(){//왼쪽으로 움직였을때 작은 4개 블록의 좌표
 		--x;
 		calculateCoordinate();
 	}
@@ -106,7 +112,7 @@ public void moveLeft(){//왼쪽으로 움직였을때 작은 4개 블록의 좌�
 		{new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(0,1), new Coordinate(1,1)},
 		//270도
 		{new Coordinate(-1,0), new Coordinate(0,0), new Coordinate(1,0), new Coordinate(1,-1)}
-};
+	};
 	//4번 LShape도형의 각도별 좌표
 	private static Coordinate[][] LShape = new Coordinate[][]{
 		//0도
@@ -179,6 +185,14 @@ public void moveLeft(){//왼쪽으로 움직였을때 작은 4개 블록의 좌�
 			coordinates[i].x=x+cor[rotateIndex][i].x;
 			coordinates[i].y=y+cor[rotateIndex][i].y;		
 		}
+	}
+	//작은 4개 블록중 원하는(index)블록의 x값을 얻는다.
+	public int getX(int index){
+		return this.coordinates[index].x;	
+	}
+	//작은 4개 블록중 원하는(index)블록의  y값을 얻는다.
+	public int getY(int index){
+		return this.coordinates[index].y;
 	}
 
 } 

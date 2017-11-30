@@ -18,20 +18,21 @@ public class Board extends JPanel implements ActionListener {
 	Timer timer;
 	boolean started = false;
 	boolean paused = false;
+	boolean fallingFinished = false;
 
 	int currentX = 0; // 블록의 x좌표
 	int currentY = 0; // 블록의 y좌표
 
 	Shape currentShape; // 블록의 형태
 
-	// Piece[] board; // 가상 테트리스 필드
+	int[][] cells; // 가상 테트리스 필드
 	// TODO 추후수정
 
 	public Board() {
 		setFocusable(true);// 포커스 설정
 		currentShape = new Shape();
 		timer = new Timer(400, this);// 일정 시간마다 actionPerformed 메소드 실행(imp
-										// ActionListener) 400 ms
+		// ActionListener) 400 ms
 		timer.start();// 타이머 시작
 
 		// 쌓이는 블록에 대한 정보를 저장하는 필드 생성
@@ -113,9 +114,9 @@ public class Board extends JPanel implements ActionListener {
 		// 사각형의 외부 상단, 왼쪽
 		g.setColor(color.brighter());
 		g.drawLine(x, y + ((int) getSize().getHeight() / height) - 1, x, y); // 왼쪽
-																				// 선
+		// 선
 		g.drawLine(x, y, x + ((int) getSize().getWidth() / width) - 1, y); // 상단
-																			// 선
+		// 선
 
 		// 사각형의 외부 하단, 오른쪽
 		g.setColor(color.darker());
@@ -125,7 +126,87 @@ public class Board extends JPanel implements ActionListener {
 				x + ((int) getSize().getWidth() / width) - 1, y + 1);// 오른쪽
 
 	}
+	//새로운 보드 화면
+	private void clearBoard(){ 
+		cells = new int[width][height]; 
+	} 
+	/*	이것도 되나 해서 적어봅니다...
+	 * 	public void clear(){
+	 * 			for(int i=0;i<height;i++){
+	 * 					for(int j=0; j<width;j++){
+	 * 							cells[i][j]=0;
+	 * 					}
+	 * 			}
+	 * }
+	 */
 
+	//블럭 떨어뜨리기(스페이스바 사용시)
+	public void dropDown() { 
+		int newY = currentY; 
+		while (newY > 0) {// y좌표가 0보다 크면 즉 맨 밑에 닿을때 까지 y좌표를 감소시켜준다 
+			if (!tryMove(currentShape, currentX, newY - 1)) 
+				break; 
+			--newY; 
+		} 
+		pieceDrop(); 
+	}
+	//블럭 떨어뜨리기(방향키 아래키 사용시)
+	public void oneLineDown() { 
+		if (!tryMove(currentShape, currentX, currentY - 1)) {// 한칸 아래로 
+			pieceDrop(); 
+		} 
+	} 
+	
+	public void pieceDrop(){// 아직 덜 했음! 
+		removeFullLine(); 
+		if (fallingFinished) { 
+			newPiece(); 
+		}
+	} 
+	//줄 삭제 메소드
+	private void removeFullLine() {
+
+		for (int i = height - 1; i >= 0; --i) {
+			boolean lineIsFull = true;
+
+			for (int j = 0; j < width; ++j) {//줄이 가득찼는지 확인
+				if (shapeAt(j, i) == 0) {
+					lineIsFull = false;
+					break;
+				}
+			}
+
+			if (lineIsFull) {
+				cells[i][j+1] = cells[i][j]; 
+				newPiece();
+			}
+		}
+
+	}
+	//이동 유효 검사 메소드
+	private boolean tryMove(Shape newPiece, int x , int y){ 
+		for (int i = 0; i < 4; ++i) { 
+			int tempX = x + newPiece.getX(i); 
+			int tempY = y - newPiece.getY(i); 
+			//벽이면 더 못감
+			if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height) 
+				return false;
+			//
+			if (shapeAt(tempY, tempY) != 1) 
+				return false; 
+		} 
+		currentShape = newPiece; 
+		currentX = x; 
+		currentY = y; 
+		repaint(); 
+		
+		return true; 
+	} 
+	
+	private int shapeAt(int x, int y){ 
+		return cells[x][y]; 
+	} 
+	//
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -139,23 +220,24 @@ public class Board extends JPanel implements ActionListener {
 				return;
 			//TODO Method명따라 변경
 			switch (e.getKeyCode()){
-				case KeyEvent.VK_DOWN: // 아래 방향키를 눌렀을 경우
-					moveDown(); // 한 줄 떨어지기
-					break;
-				case KeyEvent.VK_LEFT: // 왼쪽 방향키를 눌렀을 경우
-					moveLeft(); // 왼쪽으로 한 칸 이동
-					break;
-				case KeyEvent.VK_RIGHT: //  오른쪽 방향키를 눌렀을 경우
-					moveRight(); // 오른쪽으로 한 칸 이동
-					break;
-				case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
-					rotate(); // 모양 변경
-					break;
-				case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
-					pause(); // 일시정지
-					break;
+			case KeyEvent.VK_DOWN: // 아래 방향키를 눌렀을 경우
+				moveDown(); // 한 줄 떨어지기
+				break;
+			case KeyEvent.VK_LEFT: // 왼쪽 방향키를 눌렀을 경우
+				moveLeft(); // 왼쪽으로 한 칸 이동
+				break;
+			case KeyEvent.VK_RIGHT: //  오른쪽 방향키를 눌렀을 경우
+				moveRight(); // 오른쪽으로 한 칸 이동
+				break;
+			case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
+				rotate(); // 모양 변경
+				break;
+			case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
+				pause(); // 일시정지
+				break;
 			}
-			
-			
+
+
 		}
+	}
 }
