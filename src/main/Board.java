@@ -11,7 +11,10 @@ import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import temp.Shape.Tetrominoes;
+
 public class Board extends JPanel implements ActionListener {
+	
 	int width = 10; // 테트리스 가상 가로 길이
 	int height = 22; // 테트리스 가상 세로 길이
 
@@ -181,8 +184,32 @@ public class Board extends JPanel implements ActionListener {
 				newPiece();
 			}
 		}
+  }
+  private int shapeAt(int x, int y){ 
+		return cells[x][y]; 
+	}
+
+ 
+	public void pieceDrop() {// 아직 덜 했음!
+
+		removeFullLine();
+
+		if (fallingFinished) {
+			newPiece();
+		}
 
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+
+	};
+	
+	private void clearBoard(){
+		cells = new int[width][height];
+	}
+
 	//이동 유효 검사 메소드
 	private boolean tryMove(Shape newPiece, int x , int y){ 
 		for (int i = 0; i < 4; ++i) { 
@@ -202,17 +229,10 @@ public class Board extends JPanel implements ActionListener {
 		
 		return true; 
 	} 
-	
-	private int shapeAt(int x, int y){ 
-		return cells[x][y]; 
-	} 
-	//
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 
-	};
-
+	private int shapeAt(int x, int y){
+		return cells[x][y];
+	}
 	class Adapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e){
@@ -235,9 +255,8 @@ public class Board extends JPanel implements ActionListener {
 			case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
 				pause(); // 일시정지
 				break;
-			}
-
-
+      }			
 		}
+}
 	}
 }
