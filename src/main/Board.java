@@ -11,8 +11,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import temp.Shape.Tetrominoes;
-
 public class Board extends JPanel implements ActionListener {
 	
 	int width = 10; // 테트리스 가상 가로 길이
@@ -70,6 +68,7 @@ public class Board extends JPanel implements ActionListener {
 		repaint();
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 
@@ -146,12 +145,17 @@ public class Board extends JPanel implements ActionListener {
 		}
 
 	}
-
+	
+	
 	public void pieceDrop() {// 아직 덜 했음!
-
+		for(int i=0; i<4; i++) {
+			Coordinate cor = currentShape.getCoordinate(i);
+			cells[currentX + cor.x][currentY + cor.y] = 1;
+		}
+		
 		removeFullLine();
-
-		if (fallingFinished) {
+		
+		if(!fallingFinished) {
 			newPiece();
 		}
 
@@ -191,18 +195,16 @@ public class Board extends JPanel implements ActionListener {
 	class Adapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e){
-			if(!this.isKey)	
-				return;
 			//TODO Method명따라 변경
 			switch (e.getKeyCode()){
 				case KeyEvent.VK_DOWN: // 아래 방향키를 눌렀을 경우
-					moveDown(); // 한 줄 떨어지기
+					dropDown(); // 한 줄 떨어지기
 					break;
 				case KeyEvent.VK_LEFT: // 왼쪽 방향키를 눌렀을 경우
-					moveLeft(); // 왼쪽으로 한 칸 이동
+					tryMove(currentShape, currentX-1, currentY); // 왼쪽으로 한 칸 이동
 					break;
 				case KeyEvent.VK_RIGHT: //  오른쪽 방향키를 눌렀을 경우
-					moveRight(); // 오른쪽으로 한 칸 이동
+					tryMove(currentShape, currentX+1, currentY); // 오른쪽으로 한 칸 이동
 					break;
 				case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
 					rotate(); // 모양 변경
