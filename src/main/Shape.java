@@ -1,6 +1,6 @@
 package main;
 
-import java.util.Random;
+import java.util.Random
 import java.lang.Math;
 
 public class Shape {
@@ -16,6 +16,8 @@ public class Shape {
 												// 것.
 		this.rotateIndex = 0;
 		calculateCoordinate();
+		this(shapeType);
+		
 	}
 
 	public Shape(int shapeType) {// 선택된 블록의 정보

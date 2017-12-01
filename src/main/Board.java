@@ -200,6 +200,20 @@ public class Board extends JPanel implements ActionListener {
 
 	}
 
+	private void newPiece() {
+		currentShape=new Shape(); //랜덤블록 생성 
+		currentX = width / 2 + 1; //중앙에 새로운 블록 생성 
+		currentY = height - 1 + currentShape.minY();
+		if(!tryMove(currentShape, courrentX, courrentY)) {
+			currentShape=new Shape();//NoShape가 없어서 randomshape로 지정
+			timer.stop();
+			started=false;
+		}
+
+
+
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
