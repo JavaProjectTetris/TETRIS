@@ -22,6 +22,7 @@ public class Adapter extends KeyAdapter {
 				break;
 			case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
 				pause(); // 일시정지
+
 				break;
 		}
 		
