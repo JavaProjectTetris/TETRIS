@@ -11,10 +11,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import temp.Shape.Tetrominoes;
-
 public class Board extends JPanel implements ActionListener {
-	
+
 	int width = 10; // 테트리스 가상 가로 길이
 	int height = 22; // 테트리스 가상 세로 길이
 
@@ -39,7 +37,7 @@ public class Board extends JPanel implements ActionListener {
 		timer.start();// 타이머 시작
 
 		// 쌓이는 블록에 대한 정보를 저장하는 필드 생성
-		// board = new Piece[width * height];
+		cells = new int[width][height];
 		// TODO 추후수정
 		// 테트리스 게임에 대한 키보드 리스너 등록
 		addKeyListener(new Adapter());
@@ -94,8 +92,7 @@ public class Board extends JPanel implements ActionListener {
 			for (int i = 0; i < 4; ++i) {
 				int x = currentX + currentShape.getX(i);
 				int y = currentY - currentShape.getY(i);
-				drawShape(g, 0 + x * ((int) size.getWidth() / width),
-						boardTop + (height - y - 1) * ((int) size.getHeight() / height), currentShape.getPiece());
+				drawShape(g, 0 + x * ((int) size.getWidth() / width), boardTop + (height - y - 1) * ((int) size.getHeight() / height), currentShape.getPiece());
 			}
 		}
 	}
@@ -158,16 +155,14 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void newPiece() {
-		currentShape=new Shape(); //랜덤블록 생성 
-		currentX = width / 2 + 1; //중앙에 새로운 블록 생성 
+		currentShape = new Shape(); // 랜덤블록 생성
+		currentX = width / 2 + 1; // 중앙에 새로운 블록 생성
 		currentY = height - 1 + currentShape.minY();
-		if(!tryMove(currentShape, courrentX, courrentY)) {
-			currentShape=new Shape();//NoShape가 없어서 randomshape로 지정
+		if (!tryMove(currentShape, currentX, currentY)) {
+			currentShape = new Shape();// NoShape가 없어서 randomshape로 지정
 			timer.stop();
-			started=false;
+			started = false;
 		}
-
-
 
 	}
 
@@ -176,46 +171,52 @@ public class Board extends JPanel implements ActionListener {
 		// TODO Auto-generated method stub
 
 	};
-	
-	private void clearBoard(){
+
+	private void clearBoard() {
 		cells = new int[width][height];
 	}
 
-	private boolean tryMove(Shape newPiece, int x , int y){
+	private boolean tryMove(Shape newPiece, int x, int y) {
 		for (int i = 0; i < 4; ++i) {
-            int tempX = x + newPiece.getX(i);
-            int tempY = y - newPiece.getY(i);
-            if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height)
-                return false;
-            if (shapeAt(tempY, tempY) != 1)
-                return false;
-        }
+			int tempX = x + newPiece.getX(i);
+			int tempY = y - newPiece.getY(i);
+			if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height)
+				return false;
+			if (shapeAt(tempY, tempY) != 1)
+				return false;
+		}
 
-        currentShape = newPiece;
-        currentX = x;
-        currentY = y;
-        repaint();
-        return true;
+		currentShape = newPiece;
+		currentX = x;
+		currentY = y;
+		repaint();
+		return true;
 
 	}
-	
-	private int shapeAt(int x, int y){
+
+	private int shapeAt(int x, int y) {
 		return cells[x][y];
 	}
+
+	private void removeFullLine(){
+		//TODO 작업해야됨
+		
+	}
+	
 	class Adapter extends KeyAdapter {
 		@Override
-		public void keyPressed(KeyEvent e){
-			if(!this.isKey)	
+		public void keyPressed(KeyEvent e) {
+			if (!started)
 				return;
-			//TODO Method명따라 변경
-			switch (e.getKeyCode()){
+			// TODO Method명따라 변경
+			switch (e.getKeyCode()) {
 				case KeyEvent.VK_DOWN: // 아래 방향키를 눌렀을 경우
 					moveDown(); // 한 줄 떨어지기
 					break;
 				case KeyEvent.VK_LEFT: // 왼쪽 방향키를 눌렀을 경우
 					moveLeft(); // 왼쪽으로 한 칸 이동
 					break;
-				case KeyEvent.VK_RIGHT: //  오른쪽 방향키를 눌렀을 경우
+				case KeyEvent.VK_RIGHT: // 오른쪽 방향키를 눌렀을 경우
 					moveRight(); // 오른쪽으로 한 칸 이동
 					break;
 				case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
@@ -225,7 +226,7 @@ public class Board extends JPanel implements ActionListener {
 					pause(); // 일시정지
 					break;
 			}
-			
+
 		}
-		}
+	}
 }
