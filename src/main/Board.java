@@ -7,12 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Board extends JPanel implements ActionListener {
-	
+
 	int width = 10; // 테트리스 가상 가로 길이
 	int height = 22; // 테트리스 가상 세로 길이
 
@@ -37,7 +38,7 @@ public class Board extends JPanel implements ActionListener {
 		timer.start();// 타이머 시작
 
 		// 쌓이는 블록에 대한 정보를 저장하는 필드 생성
-		// board = new Piece[width * height];
+		cells = new int[width][height];
 		// TODO 추후수정
 		// 테트리스 게임에 대한 키보드 리스너 등록
 		addKeyListener(new Adapter());
@@ -78,36 +79,33 @@ public class Board extends JPanel implements ActionListener {
 		// 쌓여 있는 블록을 그린다.
 		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
-				// TODO panel-->변화시 다시 코딩
-				Piece shape = board[((height - i - 1) * width) + j];
-				if (shape != Piece.NoShape)
+				if (cells[j][i]!=0)
 					drawShape(g, 0 + j * ((int) size.getWidth() / width),
-							boardTop + i * ((int) size.getHeight() / height), shape);
+							boardTop + i * ((int) size.getHeight() / height), currentShape);
 			}
 		}
 
 		// TODO panel --> 변화시 다시 코딩
 		// 현재 떨어지고 있는 테트리스 블록을 그린다.
-		if (currentShape.getPiece() != Piece.NoShape) {
+		//if (currentShape.getPiece() != Piece.NoShape) {
 			// 테트리스 블록을 그린다.
 			for (int i = 0; i < 4; ++i) {
 				int x = currentX + currentShape.getX(i);
 				int y = currentY - currentShape.getY(i);
-				drawShape(g, 0 + x * ((int) size.getWidth() / width),
-						boardTop + (height - y - 1) * ((int) size.getHeight() / height), currentShape.getPiece());
+				drawShape(g, 0 + x * ((int) size.getWidth() / width), boardTop + (height - y - 1) * ((int) size.getHeight() / height), currentShape);
 			}
-		}
+		//}
 	}
 
 	// TODO panel변화시 수정
-	private void drawShape(Graphics g, int x, int y, Piece shape) {
+	private void drawShape(Graphics g, int x, int y, Shape shape) {
 		// 색 정의 모양과 같은 위치에 해당하는 것의 색이 정의되어 있다.
 		Color colors[] = { new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102),
 				new Color(102, 102, 204), new Color(204, 204, 102), new Color(204, 102, 204), new Color(102, 204, 204),
 				new Color(218, 170, 0) };
 
 		// 선택된 모양의 컬러 가져오기
-		Color color = colors[shape.ordinal()];
+		Color color = colors[shape.getShapeType()];
 
 		// 사각형의 내부
 		g.setColor(color);
@@ -132,15 +130,12 @@ public class Board extends JPanel implements ActionListener {
 	private void clearBoard(){ 
 		cells = new int[width][height]; 
 	} 
-	/*	이것도 되나 해서 적어봅니다...
-	 * 	public void clear(){
-	 * 			for(int i=0;i<height;i++){
-	 * 					for(int j=0; j<width;j++){
-	 * 							cells[i][j]=0;
-	 * 					}
-	 * 			}
-	 * }
-	 */
+		//이것도 되나 해서 적어봅니다...
+	  	public void clear(){//Method 수정
+	  		for(int[] rows : cells)	
+	  			Arrays.fill(rows, 0);
+	  }
+	 
 
 	//블럭 떨어뜨리기(스페이스바 사용시)
 	public void dropDown() { 
@@ -152,6 +147,7 @@ public class Board extends JPanel implements ActionListener {
 		} 
 		pieceDrop(); 
 	}
+	
 	//블럭 떨어뜨리기(방향키 아래키 사용시)
 	public void oneLineDown() { 
 		if (!tryMove(currentShape, currentX, currentY - 1)) {// 한칸 아래로 
@@ -173,16 +169,22 @@ public class Board extends JPanel implements ActionListener {
 			}
 
 			if (lineIsFull) {
-				cells[i][j+1] = cells[i][j]; 
-				newPiece();
+				for (int k = i; k < height- 1; ++k) {
+					for (int j = 0; j < width; ++j)
+						cells[j][k] = 0;
+				}
 			}
 		}
   }
 
 	public void pieceDrop() {// 아직 덜 했음!
-		for(int i=0; i<4; i++) {
+		System.out.println(currentShape.minY());
+		for(int i=0; i<4; i++) {//minY값 이용
 			Coordinate cor = currentShape.getCoordinate(i);
-			cells[currentX + cor.x][currentY + cor.y] = 1;
+			//System.out.println(cor.x);
+			//System.out.println(cor.y);
+			//디버깅중 ...
+			cells[currentX + cor.x][height - currentY - cor.y-1] = currentShape.getShapeType();
 		}
 		
 		removeFullLine();
@@ -190,40 +192,44 @@ public class Board extends JPanel implements ActionListener {
 		if(!fallingFinished) {
 			newPiece();
 		}
-
 	}
 
 	private void newPiece() {
-		currentShape=new Shape(); //랜덤블록 생성 
-		currentX = width / 2 + 1; //중앙에 새로운 블록 생성 
+		currentShape = new Shape(); // 랜덤블록 생성
+		currentX = width / 2 + 1; // 중앙에 새로운 블록 생성
 		currentY = height - 1 + currentShape.minY();
+		
 		if(!tryMove(currentShape, currentX, currentY)) {
 			currentShape=new Shape();//NoShape가 없어서 randomshape로 지정
 			timer.stop();
-			started=false;
+			started = false;
 		}
-
-
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-
+		if (fallingFinished) {
+			fallingFinished = false;
+			newPiece();
+		} else {
+			oneLineDown();
+		}
 	};
-	
+
 
 	//이동 유효 검사 메소드
 	private boolean tryMove(Shape newPiece, int x , int y){ 
 		for (int i = 0; i < 4; ++i) { 
 			int tempX = x + newPiece.getX(i); 
 			int tempY = y - newPiece.getY(i); 
+			
 			//벽이면 더 못감
 			if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height) 
 				return false;
-			//
-			if (shapeAt(tempY, tempY) != 1) 
+			
+			if (shapeAt(tempX, tempY) != 0) 
 				return false; 
 		} 
 		currentShape = newPiece; 
@@ -237,6 +243,7 @@ public class Board extends JPanel implements ActionListener {
 	private int shapeAt(int x, int y){
 		return cells[x][y];
 	}
+	
 	class Adapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e){
@@ -253,7 +260,7 @@ public class Board extends JPanel implements ActionListener {
 				tryMove(currentShape, currentX+1, currentY); // 오른쪽으로 한 칸 이동
 				break;
 			case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
-				rotate(); // 모양 변경
+				tryMove(currentShape.rotate(),currentX,currentY); // 모양 변경
 				break;
 			case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
 				pause(); // 일시정지
@@ -263,6 +270,5 @@ public class Board extends JPanel implements ActionListener {
 		}
 
 	}
-
 
 }

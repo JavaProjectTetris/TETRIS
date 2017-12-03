@@ -1,10 +1,12 @@
-package tetrisTest;
+package main;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class Adapter extends KeyAdapter {
+	/*
 	@Override
+	
 	public void keyPressed(KeyEvent e){
 		if(!this.isKey)	return;
 		switch (e.getKeyCode()){
@@ -28,4 +30,5 @@ public class Adapter extends KeyAdapter {
 		
 		
 	}
+	*/
 }
