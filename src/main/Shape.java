@@ -1,6 +1,7 @@
 package main;
 
-import java.util.Random
+import java.util.Arrays;
+import java.util.Random;
 import java.lang.Math;
 
 public class Shape {
@@ -15,9 +16,10 @@ public class Shape {
 		this.shapeType = random.nextInt(7) + 1;// 1~7사이의 임의의 값으로 각각의 도형모양을 의미할
 												// 것.
 		this.rotateIndex = 0;
+		for(int i=0; i< 4; i++)
+			coordinates[i] = new Coordinate(0,0);
 		calculateCoordinate();
-		this(shapeType);
-		
+	
 	}
 
 	public Shape(int shapeType) {// 선택된 블록의 정보
@@ -27,19 +29,25 @@ public class Shape {
 	}
 
 	public int minX() {// 블록의 작은 4개 블록의 좌표 중 가장 작은 x좌표
+
 		int min = Integer.MAX_VALUE;// 최대 10자리 숫자를 받아야 최솟값이 바로 들어간다.int타입으로 하면
 									// RuntimeError가 발생할수있다.
+
 		for (int i = 0; i < 4; i++) {
 			min = Math.min(min, coordinates[i].x);
 		}
+
 		return min;
 	}
 
 	public int minY() {// 블록의 작은 4개 블록의 좌표 중 가장 작은 y좌표
+
 		int min = Integer.MAX_VALUE;
+
 		for (int i = 0; i < 4; i++) {
 			min = Math.min(min, coordinates[i].y);
 		}
+
 		return min;
 	}
 
@@ -58,12 +66,13 @@ public class Shape {
 		calculateCoordinate();
 	}
 
-	public void rotate() {
+	public Shape rotate() {
 		++rotateIndex;
 		if (rotateIndex >= 4) {
 			rotateIndex = 0;// 회전이 270도가 넘으면 즉,360도로 0도와 같다.
 		}
 		calculateCoordinate();
+		return this;
 	}
 
 	public Coordinate getCoordinate(int index) {// 블록 4칸중 원하는 1개 블록의 x,y좌표
@@ -78,9 +87,9 @@ public class Shape {
 	// 1번 IShape도형의 각도별 좌표
 	private static Coordinate[][] IShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(0, -2) },
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(0, 2) },
 			// 90도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-2, 0) },
+			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(2, 0) },
 			// 180도
 			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(0, 2) },
 			// 270도
@@ -184,11 +193,17 @@ public class Shape {
 		}
 	}
 
-	public int getX(int index){
+	// 작은 4개 블록중 원하는(index)블록의 x값을 얻는다.
+	public int getX(int index) {
 		return this.coordinates[index].x;
 	}
-	
-	public int getY(int index){
+
+	// 작은 4개 블록중 원하는(index)블록의 y값을 얻는다.
+	public int getY(int index) {
 		return this.coordinates[index].y;
+	}
+
+	public int getShapeType() {
+		return this.shapeType;
 	}
 }
