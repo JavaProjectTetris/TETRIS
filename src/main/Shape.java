@@ -16,10 +16,10 @@ public class Shape {
 		this.shapeType = random.nextInt(7) + 1;// 1~7사이의 임의의 값으로 각각의 도형모양을 의미할
 												// 것.
 		this.rotateIndex = 0;
-		for(int i=0; i< 4; i++)
-			coordinates[i] = new Coordinate(0,0);
+		for (int i = 0; i < 4; i++)
+			coordinates[i] = new Coordinate(0, 0);
 		calculateCoordinate();
-	
+
 	}
 
 	public Shape(int shapeType) {// 선택된 블록의 정보
@@ -38,6 +38,30 @@ public class Shape {
 		}
 
 		return min;
+	}
+
+	public int maxX() {
+		int max = Integer.MIN_VALUE;// 최대 10자리 숫자를 받아야 최솟값이 바로 들어간다.int타입으로 하면
+		// RuntimeError가 발생할수있다.
+
+		for (int i = 0; i < 4; i++) {
+			max = Math.max(max, coordinates[i].x);
+		}
+
+		return max;
+
+	}
+
+	public int maxY() {
+		int max = Integer.MIN_VALUE;// 최대 10자리 숫자를 받아야 최솟값이 바로 들어간다.int타입으로 하면
+		// RuntimeError가 발생할수있다.
+
+		for (int i = 0; i < 4; i++) {
+			max = Math.max(max, coordinates[i].y);
+		}
+
+		return max;
+
 	}
 
 	public int minY() {// 블록의 작은 4개 블록의 좌표 중 가장 작은 y좌표
@@ -72,6 +96,7 @@ public class Shape {
 			rotateIndex = 0;// 회전이 270도가 넘으면 즉,360도로 0도와 같다.
 		}
 		calculateCoordinate();
+
 		return this;
 	}
 
@@ -107,13 +132,13 @@ public class Shape {
 	// 3번 JShape도형의 각도별 좌표
 	private static Coordinate[][] JShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, -1) },
+			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, -1) },
 			// 90도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, 1) },
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(-1, 1) },
 			// 180도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(1, 1) },
+			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, 1) },
 			// 270도
-			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, -1) } };
+			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(1, -1) } };
 	// 4번 LShape도형의 각도별 좌표
 	private static Coordinate[][] LShape = new Coordinate[][] {
 			// 0도
@@ -188,8 +213,8 @@ public class Shape {
 		// 블록의 기준좌표+상대좌표=4칸의 좌표
 		Coordinate[][] cor = GetShapeCor(this.shapeType);// 상대좌표
 		for (int i = 0; i < 4; i++) {
-			coordinates[i].x = x + cor[rotateIndex][i].x;
-			coordinates[i].y = y + cor[rotateIndex][i].y;
+ 			coordinates[i].x = x + cor[rotateIndex][i].x;
+  			coordinates[i].y = y - cor[rotateIndex][i].y;
 		}
 	}
 
@@ -206,4 +231,5 @@ public class Shape {
 	public int getShapeType() {
 		return this.shapeType;
 	}
+
 }
