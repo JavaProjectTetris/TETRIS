@@ -16,7 +16,7 @@ public class Music extends Thread{
 	public Music(String name, boolean isLoop) {
 		try {
 			this.isLoop=isLoop; //false일때 까지 계속 실행 
-			file=new File(Board.class.getResource("../tetirs/music/"+name).toURI()); //음악 저장 장소를 찾음 
+			file=new File(System.getProperty("user.dir")+"/music/bgm.mp3"); //음악 저장 장소를 찾음 
 			fis =new FileInputStream(file);
 			bis=new BufferedInputStream(fis);
 			player=new Player(bis);
