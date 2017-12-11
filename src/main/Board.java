@@ -41,7 +41,6 @@ public class Board extends JPanel implements ActionListener {
 
 		// 쌓이는 블록에 대한 정보를 저장하는 필드 생성
 		cells = new int[width][height];
-
 		clearBoard();
 	}
 
