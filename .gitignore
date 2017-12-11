@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!lib/jl1.0.1.jar
 *.war
 *.ear
 *.zip
