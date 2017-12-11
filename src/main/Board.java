@@ -240,8 +240,6 @@ public class Board extends JPanel implements ActionListener {
 		int tmpX = x + currentX;
 		int tmpY = currentY - y ;
 		if (tmpX < 0 || tmpX >= width || tmpY < 0 || tmpY >= height) {
-			System.out.println(tmpX);
-			System.out.println(tmpY);
 			return false;
 		}
 		return true;
@@ -270,7 +268,6 @@ public class Board extends JPanel implements ActionListener {
 						if(!preRotate(x,y))
 							t= false;
 					}
-					System.out.println(t);
 					if(t)
 						tryMove(currentShape.rotate(), currentX, currentY); // 모양
 					break;
