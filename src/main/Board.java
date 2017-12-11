@@ -1,5 +1,8 @@
 package main;
 
+import java.io.File;
+import java.io.FileInputStream;
+import sun.audio.*;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -51,6 +54,8 @@ public class Board extends JPanel implements ActionListener {
 
 		newPiece();
 		timer.start();
+		Music introMusic=new Music("bgm.mp3", true);
+		introMusic.start();
 	}
 
 	private void pause() { // 게임 정지 혹은 다시 시작
