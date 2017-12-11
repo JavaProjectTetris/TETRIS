@@ -26,22 +26,19 @@ public class Board extends JPanel implements ActionListener {
 	int currentY = 0; // 블록의 y좌표a
 
 	Shape currentShape; // 블록의 형태
-
-	int[] cells; // 가상 테트리스 필드
-	// TODO 추후수정
+	int[][] cells; // 가상 테트리스 필드
 
 	public Board() {
 		setFocusable(true);// 포커스 설정
+		// 테트리스 게임에 대한 키보드 리스너 등록
+		addKeyListener(new Adapter());
 		currentShape = new Shape();
-		timer = new Timer(600, this);// 일정 시간마다 actionPerformed 메소드 실행(imp
-		// ActionListener) 400 ms
+		timer = new Timer(400, this);// 일정 시간마다 actionPerformed 메소드 실행(imp
 		timer.start();// 타이머 시작
 
 		// 쌓이는 블록에 대한 정보를 저장하는 필드 생성
-		cells = new int[width * height];
-		// TODO 추후수정
-		// 테트리스 게임에 대한 키보드 리스너 등록
-		addKeyListener(new Adapter());
+		cells = new int[width][height];
+
 		clearBoard();
 	}
 
@@ -74,26 +71,28 @@ public class Board extends JPanel implements ActionListener {
 		super.paint(g);
 
 		Dimension size = getSize();
-		int boardTop = (int) size.getHeight() - height * ((int) size.getHeight() / height);
+		int boardTop = (int) size.getHeight() - height * squareHeight();
 
 		// 쌓여 있는 블록을 그린다.
 		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
 				// TODO 쌓여있는 도형 색 판별법
 				// Shape temp =
-				if (shapeAt(j, height - i - 1) != 0){
+				if (shapeAt(j, height - i - 1) != 0) {
 					drawShape(g, (int) j * squareWidth(), boardTop + i * squareHeight(), shapeAt(j, height - i - 1));
 				}
 			}
 		}
 
-		
 		for (int i = 0; i < 4; ++i) {
 			int x = currentX + currentShape.getX(i);
 			int y = currentY - currentShape.getY(i);
-			drawShape(g, (int)x * squareWidth(), boardTop + (height - y - 1) * squareHeight(), currentShape.getShapeType());
+			drawShape(g, (int) x * squareWidth(), boardTop + (height - y - 1) * squareHeight(),
+					currentShape.getShapeType());
 		}
+
 	}
+
 	int squareWidth() {
 		return (int) getSize().getWidth() / width;
 	}// 도형 넓이
@@ -111,7 +110,7 @@ public class Board extends JPanel implements ActionListener {
 
 		// 선택된 모양의 컬러 가져오기
 		Color color = colors[colorType];
-		
+
 		// 사각형의 내부
 		g.setColor(color);
 		g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
@@ -130,14 +129,8 @@ public class Board extends JPanel implements ActionListener {
 
 	// 새로운 보드 화면
 	private void clearBoard() {
-		cells = new int[width * height];
+		cells = new int[width][height];
 	}
-
-	// 이것도 되나 해서 적어봅니다...
-	//public void clear() {// Method 수정
-		//for (int[] rows : cells)
-			//Arrays.fill(rows, 0);
-	//}
 
 	// 블럭 떨어뜨리기(스페이스바 사용시)
 	public void dropDown() {
@@ -172,41 +165,42 @@ public class Board extends JPanel implements ActionListener {
 
 			if (lineIsFull) {
 				for (int k = i; k < height - 1; ++k) {
-					for (int j = 0; j < width; ++j)
-						cells[(k * width) + j] = shapeAt(j,k+1);
+					for (int j = 0; j < width; ++j) {
+						// cells[(k * width) + j] = shapeAt(j, k + 1);
+						cells[j][k] = shapeAt(j, k + 1);
+					}
 				}
 			}
 		}
 	}
 
-	public void pieceDrop() {// 아직 덜 했음!
-		for (int i = 0; i < 4; i++) {// minY값 이용
-			Coordinate cor = currentShape.getCoordinate(i);
-			int x = currentX + cor.x;
-			int y = currentY - cor.y;
-			cells[(y * width) + x] = currentShape.getShapeType();
+	public void pieceDrop() {
+		for (int i = 0; i < 4; i++) {
+			int x = currentX + currentShape.getX(i);
+			int y = currentY - currentShape.getY(i);
+			cells[x][y] = currentShape.getShapeType();
 		}
-		
+
 		removeFullLine();
 
-		if(!fallingFinished) {
-  			newPiece();
-  		}
+		if (!fallingFinished) {
+			newPiece();
+		}
+
 	}
 
 	private void newPiece() {
 		currentShape = new Shape(); // 랜덤블록 생성
 		currentX = width / 2 + 1; // 중앙에 새로운 블록 생성
 		currentY = height - 1 + currentShape.minY();
-		System.out.println(currentShape.getShapeType());
 		if (!tryMove(currentShape, currentX, currentY)) {
+			currentShape = new Shape(0);
 			timer.stop();
 			started = false;
 		}
 
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (fallingFinished) {
 			fallingFinished = false;
@@ -217,30 +211,41 @@ public class Board extends JPanel implements ActionListener {
 	};
 
 	// 이동 유효 검사 메소드
-	private boolean tryMove(Shape newPiece, int x, int y) {
-
+	public boolean tryMove(Shape newPiece, int x, int y) {
 		for (int i = 0; i < 4; ++i) {
-			int tempX = x + newPiece.getCoordinate(i).x;
-			int tempY = y - newPiece.getCoordinate(i).y;
+			int tempX = x + newPiece.getX(i);
+			int tempY = y - newPiece.getY(i);
 			// 벽이면 더 못감
-			if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height)
+			if (tempX < 0 || tempX >= width || tempY < 0 || tempY >= height) {
 				return false;
+			}
 
-			if (shapeAt(tempX, tempY) != 0)
+			if (shapeAt(tempX, tempY) != 0) {
 				return false;
+			}
 		}
+
 		currentShape = newPiece;
 		currentX = x;
 		currentY = y;
 		repaint();
-
 		return true;
 	}
 
 	private int shapeAt(int x, int y) {
-		return cells[(y * width) + x];
+		return cells[x][y];
 	}
 
+	public boolean preRotate(int x, int y){
+		int tmpX = x + currentX;
+		int tmpY = currentY - y ;
+		if (tmpX < 0 || tmpX >= width || tmpY < 0 || tmpY >= height) {
+			System.out.println(tmpX);
+			System.out.println(tmpY);
+			return false;
+		}
+		return true;
+	}
 	class Adapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -252,15 +257,22 @@ public class Board extends JPanel implements ActionListener {
 					dropDown(); // 한 줄 떨어지기
 					break;
 				case KeyEvent.VK_LEFT: // 왼쪽 방향키를 눌렀을 경우
-					tryMove(currentShape, currentX - 1, currentY); // 왼쪽으로 한 칸
-																	// 이동
+					tryMove(currentShape, currentX - 1, currentY); // 왼쪽으로 한 칸 이동
 					break;
 				case KeyEvent.VK_RIGHT: // 오른쪽 방향키를 눌렀을 경우
-					tryMove(currentShape, currentX + 1, currentY); // 오른쪽으로 한 칸
-																	// 이동
+					tryMove(currentShape, currentX + 1, currentY); // 오른쪽으로 한 칸이동
 					break;
 				case KeyEvent.VK_UP: // 위쪽 방향키를 눌렀을 경우
-					tryMove(currentShape.rotate(), currentX, currentY); // 모양 변경
+					boolean t = true;
+					for(int i=0; i<4; i++){
+						int x= currentShape.getY(i);
+						int y= currentShape.getX(i);
+						if(!preRotate(x,y))
+							t= false;
+					}
+					System.out.println(t);
+					if(t)
+						tryMove(currentShape.rotate(), currentX, currentY); // 모양
 					break;
 				case KeyEvent.VK_SPACE: // 스페이스 바를 눌렀을 경우
 					pause(); // 일시정지

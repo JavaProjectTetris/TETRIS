@@ -7,11 +7,18 @@ import java.lang.Math;
 public class Shape {
 	private static Random random = new Random();
 
-	private int shapeType;// 블록 형태 지정
-	private int rotateIndex;// 블록 회전 상태 인덱스(0=0도,1=90도,2=180도,3=270도)
-	private int x, y;// 블록의 기준좌표(0,0)이라 하자.
-	private Coordinate[] coordinates = new Coordinate[4];// 블록 4칸의 x,y좌표표현.
+	public int shapeType;// 블록 형태 지정
+	public int rotateIndex;// 블록 회전 상태 인덱스(0=0도,1=90도,2=180도,3=270도)
+	public int x, y;// 블록의 기준좌표(0,0)이라 하자.
+	public Coordinate[] coordinates = new Coordinate[4];// 블록 4칸의 x,y좌표표현.
 
+	public Shape(int shapeType){
+		this.shapeType = 0;
+		this.rotateIndex = 0;
+		for (int i = 0; i < 4; i++)
+			coordinates[i] = new Coordinate(0, 0);
+		
+	}
 	public Shape() {// 랜덤블록 생성
 		this.shapeType = random.nextInt(7) + 1;// 1~7사이의 임의의 값으로 각각의 도형모양을 의미할
 												// 것.
@@ -20,12 +27,6 @@ public class Shape {
 			coordinates[i] = new Coordinate(0, 0);
 		calculateCoordinate();
 
-	}
-
-	public Shape(int shapeType) {// 선택된 블록의 정보
-		this.shapeType = shapeType;
-		this.rotateIndex = 0;
-		calculateCoordinate();
 	}
 
 	public int minX() {// 블록의 작은 4개 블록의 좌표 중 가장 작은 x좌표
@@ -116,9 +117,9 @@ public class Shape {
 			// 90도
 			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(2, 0) },
 			// 180도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(0, 2) },
+			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(0, -2) },
 			// 270도
-			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(2, 0) } };
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(0, 2) } };
 	// 2번 OShape도형의 각도별 좌표
 	private static Coordinate[][] OShape = new Coordinate[][] {
 			// 0도
@@ -132,33 +133,33 @@ public class Shape {
 	// 3번 JShape도형의 각도별 좌표
 	private static Coordinate[][] JShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, -1) },
+			{ new Coordinate(-1, 1), new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0) },
 			// 90도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(-1, 1) },
+			{ new Coordinate(1, 1), new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1) },
 			// 180도
-			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, 1) },
+			{ new Coordinate(1, -1), new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0) },
 			// 270도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(1, -1) } };
+			{ new Coordinate(-1, -1), new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1) } };
 	// 4번 LShape도형의 각도별 좌표
 	private static Coordinate[][] LShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(1, -1) },
+			{ new Coordinate(-1, -1), new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0) },
 			// 90도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, -1) },
+			{ new Coordinate(-1, 1), new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(0, -1) },
 			// 180도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(-1, 1) },
+			{ new Coordinate(1, 1), new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(-1, 0) },
 			// 270도
-			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, 1) } };
+			{ new Coordinate(1, -1), new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(0, 1) } };
 	// 5번 SShape도형의 각도별 좌표
 	private static Coordinate[][] SShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(-1, -1) },
-			// 90도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, 1) },
-			// 180도
 			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(1, 1) },
+			// 90도
+			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, -1) },
+			// 180도
+			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(-1, -1) },
 			// 270도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(1, -1) } };
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(-1, 1) } };
 	// 6번 ZShape도형의 각도별 좌표
 	private static Coordinate[][] ZShape = new Coordinate[][] {
 			// 0도
@@ -172,13 +173,13 @@ public class Shape {
 	// 7번 TShape도형의 각도별 좌표
 	private static Coordinate[][] TShape = new Coordinate[][] {
 			// 0도
-			{ new Coordinate(0, 1), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(1, 0) },
+			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(0, 1) },
 			// 90도
-			{ new Coordinate(1, 0), new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(0, -1) },
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(-1, 0), new Coordinate(0, 1) },
 			// 180도
-			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(-1, 0) },
+			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(0, -1) },
 			// 270도
-			{ new Coordinate(-1, 0), new Coordinate(0, 0), new Coordinate(0, -1), new Coordinate(0, 1) } };
+			{ new Coordinate(0, -1), new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(0, 1) } };
 
 	private static Coordinate[][] GetShapeCor(int shapeType) {// 선택된 블록모양별 상대좌표.
 		// 상대좌표란 블록 기준좌표에서 상대적인 거리.
@@ -213,11 +214,10 @@ public class Shape {
 		// 블록의 기준좌표+상대좌표=4칸의 좌표
 		Coordinate[][] cor = GetShapeCor(this.shapeType);// 상대좌표
 		for (int i = 0; i < 4; i++) {
- 			coordinates[i].x = x + cor[rotateIndex][i].x;
-  			coordinates[i].y = y - cor[rotateIndex][i].y;
+			coordinates[i].x=x+cor[rotateIndex][i].x;
+			coordinates[i].y=y-cor[rotateIndex][i].y;
 		}
 	}
-
 	// 작은 4개 블록중 원하는(index)블록의 x값을 얻는다.
 	public int getX(int index) {
 		return this.coordinates[index].x;
