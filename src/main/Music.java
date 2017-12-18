@@ -15,8 +15,8 @@ public class Music extends Thread{
 	private BufferedInputStream bis;
 	public Music(String name, boolean isLoop) {
 		try {
-			this.isLoop=isLoop; //false일때 까지 계속 실행 
-			file=new File(System.getProperty("user.dir")+"/music/bgm.mp3"); //음악 저장 장소를 찾음 
+			this.isLoop=isLoop; 
+			file=new File(System.getProperty("user.dir")+"/music/bgm.mp3");  
 			fis =new FileInputStream(file);
 			bis=new BufferedInputStream(fis);
 			player=new Player(bis);
